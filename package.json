@@ -10,13 +10,13 @@
     "test": "truffle test",
     "compile": "truffle compile",
     "migrate": "truffle migrate",
-    "ganache": "ganache-cli --gas-price 0",
+    "ganache": "ganache-cli --gas-price 0 --defaultBalanceEther 99999999999999999999",
     "deploy:dev": "truffle deploy --network development --reset",
     "deploy:mainnet": "truffle deploy --network mainnet --reset",
     "deploy:ropsten": "truffle deploy --network ropsten --reset",
     "deploy:rinkeby": "truffle deploy --network rinkeby --reset",
     "deploy:kovan": "truffle deploy --network kovan --reset",
-    "flat": "truffle-flattener contracts/Token.sol > flat/Token.sol && truffle-flattener contracts/OKGlobalCrowdsale.sol > flat/OKGlobalCrowdsale.sol"
+    "flat": "truffle-flattener contracts/OKGlobalCrowdsale.sol > flat/OKGlobalCrowdsale_1.0.0.sol"
   },
   "repository": {
     "type": "git",

@@ -1,5 +1,3 @@
-// File: @openzeppelin/contracts/token/ERC20/IERC20.sol
-
 pragma solidity ^0.5.0;
 
 /**
@@ -76,10 +74,6 @@ interface IERC20 {
      */
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
-
-// File: @openzeppelin/contracts/math/SafeMath.sol
-
-pragma solidity ^0.5.0;
 
 /**
  * @dev Wrappers over Solidity's arithmetic operations with added overflow
@@ -236,10 +230,6 @@ library SafeMath {
     }
 }
 
-// File: @openzeppelin/contracts/GSN/Context.sol
-
-pragma solidity ^0.5.0;
-
 /*
  * @dev Provides information about the current execution context, including the
  * sender of the transaction and its data. While these are generally available
@@ -265,10 +255,6 @@ contract Context {
         return msg.data;
     }
 }
-
-// File: @openzeppelin/contracts/utils/Address.sol
-
-pragma solidity ^0.5.5;
 
 /**
  * @dev Collection of functions related to the address type
@@ -338,13 +324,6 @@ library Address {
         require(success, "Address: unable to send value, recipient may have reverted");
     }
 }
-
-// File: @openzeppelin/contracts/token/ERC20/SafeERC20.sol
-
-pragma solidity ^0.5.0;
-
-
-
 
 /**
  * @title SafeERC20
@@ -416,10 +395,6 @@ library SafeERC20 {
     }
 }
 
-// File: @openzeppelin/contracts/utils/ReentrancyGuard.sol
-
-pragma solidity ^0.5.0;
-
 /**
  * @dev Contract module that helps prevent reentrant calls to a function.
  *
@@ -473,15 +448,6 @@ contract ReentrancyGuard {
         _notEntered = true;
     }
 }
-
-// File: @openzeppelin/contracts/crowdsale/Crowdsale.sol
-
-pragma solidity ^0.5.0;
-
-
-
-
-
 
 /**
  * @title Crowdsale
@@ -676,12 +642,6 @@ contract Crowdsale is Context, ReentrancyGuard {
     }
 }
 
-// File: @openzeppelin/contracts/crowdsale/validation/CappedCrowdsale.sol
-
-pragma solidity ^0.5.0;
-
-
-
 /**
  * @title CappedCrowdsale
  * @dev Crowdsale with a limit for total contributions.
@@ -725,12 +685,6 @@ contract CappedCrowdsale is Crowdsale {
         require(weiRaised().add(weiAmount) <= _cap, "CappedCrowdsale: cap exceeded");
     }
 }
-
-// File: @openzeppelin/contracts/crowdsale/validation/TimedCrowdsale.sol
-
-pragma solidity ^0.5.0;
-
-
 
 /**
  * @title TimedCrowdsale
@@ -825,14 +779,6 @@ contract TimedCrowdsale is Crowdsale {
         _closingTime = newClosingTime;
     }
 }
-
-// File: contracts/OKGlobalCrowdsale.sol
-
-pragma solidity ^0.5.0;
-
-
-
-
 
 contract OKGlobalCrowdsale is CappedCrowdsale, TimedCrowdsale {
   constructor (
