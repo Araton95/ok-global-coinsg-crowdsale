@@ -7,7 +7,7 @@ const OKGlobalCrowdsale = contract.fromArtifact('OKGlobalCrowdsale')
 const Token = contract.fromArtifact('Token')
 
 describe('OKglobalCrowdsale.test', function () {
-  const [ owner, investor, wallet, purchaser ] = accounts
+  const [ owner, investor, purchaser ] = accounts
   const configs = {
     'TOKEN_PRICE':  '500000',         // 1 ETH = 500,000 tokens
     'HARD_CAP':     '50000',          // 50,000 ETH hard cap
@@ -16,7 +16,7 @@ describe('OKglobalCrowdsale.test', function () {
     'DURATION':     5184000,          // 60 days in seconds
   }
 
-  before('Deploy contracts', async () => {
+  before('Deploy contract', async () => {
     // Advance to the next block to correctly read time in the solidity "now" function interpreted by ganache
     await time.advanceBlock()
 
@@ -55,7 +55,21 @@ describe('OKglobalCrowdsale.test', function () {
     })
   })
 
-  describe('Purchase with different amounts', async () => {
+  describe('What if purchase different amounts', async () => {
+    it('Purchase for 0x0 address should be failed', async () => {
+      await expectRevert(
+        this.crowdsale.buyTokens(ZERO_ADDRESS, { from: investor, value: ether('1') }),
+        "Crowdsale: beneficiary is the zero address"
+      )
+    })
+
+    it('Purchase without ETH should be failed', async () => {
+      await expectRevert(
+        this.crowdsale.buyTokens(investor, { from: investor, value: '0x0' }),
+        "Crowdsale: weiAmount is 0"
+      )
+    })
+
     it('Purchase with 1 wei (minimum amount), check investor token balance and company ETH balance', async () => {
       const ownerEthBalanceBefore = await balance.current(owner)
       const investorBalanceBefore = await this.token.balanceOf(investor)
@@ -118,9 +132,51 @@ describe('OKglobalCrowdsale.test', function () {
       different = contractBalanceAfter.sub(contractBalanceBefore).toString()
       expect(different).to.equal(ether('-5000000').toString())
     })
+
+    it('Purchase with 99 ETH, check investor token balance and company ETH balance', async () => {
+      const ownerEthBalanceBefore = await balance.current(owner)
+      const investorBalanceBefore = await this.token.balanceOf(purchaser)
+      const contractBalanceBefore = await this.token.balanceOf(this.crowdsale.address)
+
+      // Send ETH to crowdsale
+      await this.crowdsale.send(ether('99').toString(), { from: purchaser })
+
+      const ownerEthBalanceAfter = await balance.current(owner)
+      let different = ownerEthBalanceAfter.sub(ownerEthBalanceBefore).toString()
+      expect(different).to.equal(ether('99').toString())
+
+      const investorBalanceAfter = await this.token.balanceOf(purchaser)
+      different = investorBalanceAfter.sub(investorBalanceBefore).toString()
+      expect(different).to.equal(ether('49500000').toString())
+
+      const contractBalanceAfter = await this.token.balanceOf(this.crowdsale.address)
+      different = contractBalanceAfter.sub(contractBalanceBefore).toString()
+      expect(different).to.equal(ether('-49500000').toString())
+    })
   })
 
-  describe('Try to purchase after time crowdsale reach', async () => {
+  describe('What if finish time has been reached', async () => {
+    before('Deploy contract', async () => {
+      // Advance to the next block to correctly read time in the solidity "now" function interpreted by ganache
+      await time.advanceBlock()
+
+      configs['START_DATE'] = (await time.latest()).add(time.duration.days(1)).toString()
+
+      // Deploy token and crowdsale contracts
+      this.token = await Token.new()
+      this.crowdsale = await OKGlobalCrowdsale.new(
+        configs['TOKEN_PRICE'],
+        owner,
+        this.token.address,
+        ether(configs['HARD_CAP']),
+        parseInt(configs['START_DATE']),
+        parseInt(configs['START_DATE']) + configs['DURATION']
+      )
+
+      // Transfer crowdsale tokens to crowdsale address
+      await this.token.transfer(this.crowdsale.address, ether(configs['TOKENS_CAP']))
+    })
+
     it('Increase time', async () => {
       await time.increaseTo(parseInt(configs['START_DATE']) + configs['DURATION'] + 10)
     })
